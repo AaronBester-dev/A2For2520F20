@@ -26,4 +26,4 @@ void insertItem(struct Performance * performance, struct Array * array, unsigned
 void prependItem(struct Performance * performance, struct Array * array, void * src);
 void deleteItem(struct Performance * performance ,struct Array * array , unsigned int index);
 int findItem(struct Performance * performance, struct Array * array, int (*compar)(const void *, const void *), void * target);
-int searchItem(struct Performance * Performance, struct Array * array, int (*compar)(const void *, const void *), void * target);
+int searchItem(struct Performance * performance, struct Array * array, int (*compar)(const void *, const void *), void * target);

@@ -138,27 +138,27 @@ int findItem(struct Performance * performance, struct Array * array, int (*compa
     free(arrayByte);
 }
 
-int searchItem(struct Performance * Performance, struct Array * array, int (*compar)(const void *, const void *), void * target){
+int searchItem(struct Performance * performance, struct Array * array, int (*compar)(const void *, const void *), void * target){
     void * arrayByte = malloc(sizeof(char) * array->width);
-    int i = 0;
     int first = 0;
     int last = (int)array->nel-1;
-    int middle = (first+last)\2;
+    int middle = (first+last)/2;
     int result = 0;
-
+    
     while(first <= last){
+    
         readItem(performance,array,middle,arrayByte);
         result = (*compar)(target,arrayByte);
         if( result == 0){
             return(middle);
         }
-        else if(result > 0){
+        else if(result < 0){
             last = middle-1;
         }
         else{
             first = middle+1;
         }
-        middle = (first+last)\2;
+        middle = (first+last)/2;
     }
     return(-1);
 }
