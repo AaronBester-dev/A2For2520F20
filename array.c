@@ -41,7 +41,7 @@ void readItem(struct Performance * performance, struct Array * array, unsigned i
     int destIndex = 0;
     unsigned char * byteArray = array->data;
     unsigned char * destArray = dest;
-
+    
     for(numOfBytes = startLocation; numOfBytes < (startLocation+array->width);numOfBytes++ ){
         destArray[destIndex] = byteArray[numOfBytes];
         destIndex++;
@@ -83,6 +83,7 @@ void contract(struct Performance * performance, struct Array * array){
 
 void freeArray(struct Performance * performance, struct Array * array){
     free(array->data);
+    array->data = NULL;
     free(array);
     array = NULL;
     performance->frees++;
@@ -94,12 +95,17 @@ void appendItem(struct Performance * performance, struct Array * array, void * s
 
 void insertItem(struct Performance * performance, struct Array * array, unsigned int index, void * src){
     int i = 0;
-    void * itemToBeMoved = NULL;
-    for(i = array->nel-1; i>=index;i-=2){
+    void * itemToBeMoved = malloc(sizeof(char) * array->width);
+       
+    for(i = array->nel-1; i >= (int)index; i = i-2){
+      
         readItem(performance,array,i,itemToBeMoved);
-        writeItem(performance,array,i+1,itemToBeMoved);
+        i++;
+        writeItem(performance,array,i,itemToBeMoved);
     }
+   
     writeItem(performance,array,index,src);
+    free(itemToBeMoved);
 }
 
 void prependItem(struct Performance * performance, struct Array * array, void * src){
@@ -108,13 +114,53 @@ void prependItem(struct Performance * performance, struct Array * array, void * 
 
 void deleteItem(struct Performance * performance ,struct Array * array , unsigned int index){
      int i = 0;
-    void * itemToBeMoved = NULL;
-    for(i = array->nel-1; i>=index+1;i-=2){
+    void * itemToBeMoved = malloc(sizeof(char) * array->width);
+    for(i = (int)index+1; i<array->nel;i+=2){
         readItem(performance,array,i,itemToBeMoved);
-        writeItem(performance,array,i+1,itemToBeMoved);
+        writeItem(performance,array,--i,itemToBeMoved);
     }
+    free(itemToBeMoved);
     contract(performance,array);
 }
 
+int findItem(struct Performance * performance, struct Array * array, int (*compar)(const void *, const void *), void * target){
+    void * arrayByte = malloc(sizeof(char) * array->width);
+    int i = 0;
+    for(i = 0; i < array->nel; i++){
+        readItem(performance,array,i,arrayByte);
+        if(((*compar)(target,arrayByte)) == 0){
+            return(i);
+        }
+    }
+    return(-1);
+
+
+    free(arrayByte);
+}
+
+int searchItem(struct Performance * Performance, struct Array * array, int (*compar)(const void *, const void *), void * target){
+    void * arrayByte = malloc(sizeof(char) * array->width);
+    int i = 0;
+    int first = 0;
+    int last = (int)array->nel-1;
+    int middle = (first+last)\2;
+    int result = 0;
+
+    while(first <= last){
+        readItem(performance,array,middle,arrayByte);
+        result = (*compar)(target,arrayByte);
+        if( result == 0){
+            return(middle);
+        }
+        else if(result > 0){
+            last = middle-1;
+        }
+        else{
+            first = middle+1;
+        }
+        middle = (first+last)\2;
+    }
+    return(-1);
+}
 
 
