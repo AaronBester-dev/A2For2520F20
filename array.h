@@ -1,4 +1,5 @@
-
+#ifndef     _ARRAY_H
+#define     _ARRAY_H
 struct Array
 {
     unsigned int width;
@@ -27,3 +28,4 @@ void prependItem(struct Performance * performance, struct Array * array, void * 
 void deleteItem(struct Performance * performance ,struct Array * array , unsigned int index);
 int findItem(struct Performance * performance, struct Array * array, int (*compar)(const void *, const void *), void * target);
 int searchItem(struct Performance * performance, struct Array * array, int (*compar)(const void *, const void *), void * target);
+#endif

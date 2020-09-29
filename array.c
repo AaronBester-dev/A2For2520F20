@@ -13,15 +13,19 @@ struct Performance * newPerformance(){
 
 struct Array * newArray(struct Performance * performance, unsigned int width, unsigned int capacity){
     struct Array * emptyArray = malloc(sizeof(struct Array));
+
     if(emptyArray == NULL){
         fprintf(stderr,"Error Not enough memory to malloc a array\n");
         exit(1);
     }
+
     emptyArray->data = malloc(sizeof(char) * (width * capacity));
+
     if(emptyArray->data == NULL){
         fprintf(stderr,"Error Not enough memory to malloc data in an array\n");
         exit(1);
     }
+
     emptyArray->width = width;
     emptyArray->nel = 0;
     emptyArray->capacity = capacity;
@@ -30,17 +34,16 @@ struct Array * newArray(struct Performance * performance, unsigned int width, un
 }
 
 void readItem(struct Performance * performance, struct Array * array, unsigned int index, void * dest){
-    
-    if(index >=array->nel){
-        fprintf(stderr,"Error Index is greater than or equal to the number of elements in array\n");
-        exit(1);
-    }
-
     int numOfBytes = 0;
     int startLocation = (index * array->width); 
     int destIndex = 0;
     unsigned char * byteArray = array->data;
     unsigned char * destArray = dest;
+
+    if(index >=array->nel){
+        fprintf(stderr,"Error Index is greater than or equal to the number of elements in array\n");
+        exit(1);
+    }
     
     for(numOfBytes = startLocation; numOfBytes < (startLocation+array->width);numOfBytes++ ){
         destArray[destIndex] = byteArray[numOfBytes];
@@ -51,16 +54,17 @@ void readItem(struct Performance * performance, struct Array * array, unsigned i
 }
 
 void writeItem(struct Performance * performance, struct Array * array, unsigned int index, void * src){
-    if(index > array->nel || index >= array->capacity){
-        fprintf(stderr,"Error writing item.\n");
-        exit(1);
-    }
 
     int numOfBytes = 0;
     int startLocation = (index * array->width); 
     int srcIndex = 0;
     unsigned char * byteArray = array->data;
     unsigned char * srcArray = src;
+
+    if(index > array->nel || index >= array->capacity){
+        fprintf(stderr,"Error writing item.\n");
+        exit(1);
+    }
 
     for(numOfBytes = startLocation; numOfBytes < (startLocation+array->width); numOfBytes++){
         byteArray[numOfBytes] = srcArray[srcIndex];
@@ -98,14 +102,14 @@ void insertItem(struct Performance * performance, struct Array * array, unsigned
     void * itemToBeMoved = malloc(sizeof(char) * array->width);
        
     for(i = array->nel-1; i >= (int)index; i = i-2){
-      
         readItem(performance,array,i,itemToBeMoved);
         i++;
         writeItem(performance,array,i,itemToBeMoved);
     }
-   
-    writeItem(performance,array,index,src);
+
     free(itemToBeMoved);
+    writeItem(performance,array,index,src);
+    
 }
 
 void prependItem(struct Performance * performance, struct Array * array, void * src){
@@ -113,12 +117,14 @@ void prependItem(struct Performance * performance, struct Array * array, void * 
 }
 
 void deleteItem(struct Performance * performance ,struct Array * array , unsigned int index){
-     int i = 0;
+    int i = 0;
     void * itemToBeMoved = malloc(sizeof(char) * array->width);
+
     for(i = (int)index+1; i<array->nel;i+=2){
         readItem(performance,array,i,itemToBeMoved);
         writeItem(performance,array,--i,itemToBeMoved);
     }
+
     free(itemToBeMoved);
     contract(performance,array);
 }
@@ -126,16 +132,17 @@ void deleteItem(struct Performance * performance ,struct Array * array , unsigne
 int findItem(struct Performance * performance, struct Array * array, int (*compar)(const void *, const void *), void * target){
     void * arrayByte = malloc(sizeof(char) * array->width);
     int i = 0;
+
     for(i = 0; i < array->nel; i++){
         readItem(performance,array,i,arrayByte);
         if(((*compar)(target,arrayByte)) == 0){
+            free(arrayByte);
             return(i);
         }
     }
-    return(-1);
-
-
     free(arrayByte);
+    return(-1);
+   
 }
 
 int searchItem(struct Performance * performance, struct Array * array, int (*compar)(const void *, const void *), void * target){
@@ -146,10 +153,10 @@ int searchItem(struct Performance * performance, struct Array * array, int (*com
     int result = 0;
     
     while(first <= last){
-    
         readItem(performance,array,middle,arrayByte);
         result = (*compar)(target,arrayByte);
         if( result == 0){
+            free(arrayByte);
             return(middle);
         }
         else if(result < 0){
@@ -160,6 +167,7 @@ int searchItem(struct Performance * performance, struct Array * array, int (*com
         }
         middle = (first+last)/2;
     }
+    free(arrayByte);
     return(-1);
 }
 
