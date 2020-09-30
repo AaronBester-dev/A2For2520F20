@@ -42,7 +42,7 @@ void readItem(struct Performance * performance, struct Array * array, unsigned i
     unsigned char * destArray = dest;
 
     if(index >=array->nel){
-        fprintf(stderr,"Error Index is greater than or equal to the number of elements in array\n");
+        fprintf(stderr,"Error: Index is greater than or equal to the number of elements in array\n");
         exit(1);
     }
     
@@ -63,7 +63,7 @@ void writeItem(struct Performance * performance, struct Array * array, unsigned 
     unsigned char * srcArray = src;
 
     if(index > array->nel || index >= array->capacity){
-        fprintf(stderr,"Error writing item.\n");
+        fprintf(stderr,"Error: Index is greater than array->nel or greater than or equal to array->capacity.\n");
         exit(1);
     }
 
